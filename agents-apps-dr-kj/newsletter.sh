@@ -1,5 +1,5 @@
 #!/bin/bash
-# newsletter.sh — Runs weekly via cron to generate Agents & Apps with Dr. KJ
+# newsletter.sh: Runs weekly via cron to generate Agents & Apps with Dr. KJ
 
 set -euo pipefail
 
@@ -44,11 +44,11 @@ if [ -f "$OUTPUT_DIR/$FILENAME" ]; then
   echo "Agents & Apps with Dr. KJ saved: $FILENAME" >> "$LOG_FILE"
 
   # Email the newsletter (swap this block for Teams/SharePoint/OneDrive if preferred)
-  SUBJECT="AGENTS & APPS WITH DR. KJ — Vol. ${VOLUME} | ${TODAY}"
+  SUBJECT="AGENTS & APPS WITH DR. KJ: Vol. ${VOLUME} | ${TODAY}"
   mail -s "$SUBJECT" "$RECIPIENT" < "$OUTPUT_DIR/$FILENAME"
   echo "Email sent to $RECIPIENT" >> "$LOG_FILE"
 else
-  echo "ERROR: Output file not found — $FILENAME" >> "$LOG_FILE"
+  echo "ERROR: Output file not found: $FILENAME" >> "$LOG_FILE"
   exit 1
 fi
 
