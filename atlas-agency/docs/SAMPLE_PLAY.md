@@ -62,8 +62,8 @@ Player: **Agent BraveOtter42**, Room 12 Geography, read-aloud ON, untimed.
 ──────────────────────────────────────────────────────────────────
  STOP 4 of 4 · 📍 TOKYO, JAPAN · ISSUE THE WARRANT
 ──────────────────────────────────────────────────────────────────
- 🔍 Witness: "A snow monkey soaking in a hot spring watched the
-              thief hurry past."
+ 🔍 Witness: "The thief hurried past a snow monkey soaking in a
+              hot spring."
  🗂  Dossier: "The thief checked a brass pocket watch every five
               minutes." · "The thief wore a coat with far too many
               pockets."

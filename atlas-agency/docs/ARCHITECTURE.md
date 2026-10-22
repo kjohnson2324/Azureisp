@@ -24,11 +24,17 @@ atlas-agency/
 ├─ AGENTS.md                 Expo tooling notes for coding agents
 ├─ .env.example              EXPO_PUBLIC_SUPABASE_URL / _PUBLISHABLE_KEY
 ├─ content/
-│  ├─ countries/             (step 2) 195 country documents: capital, flag, facts, 5 clues each
-│  └─ samples/               hand-written sample mission used by tests and docs
+│  ├─ countries/source/      hand-authored clues, facts, greetings per continent (see docs/CONTENT.md)
+│  ├─ countries/dist/        GENERATED countries.json + review.csv
+│  ├─ flags/                 GENERATED 195 SVG flags (flag-icons, MIT)
+│  ├─ natural-earth/         reduced Natural Earth extract (public domain)
+│  ├─ standards/             National Geography Standards catalogue + skill mapping
+│  └─ samples/               sample mission used by tests and docs
 ├─ docs/                     architecture, story bible, sample play, (step 9) privacy + a11y audits
 ├─ scripts/
-│  └─ db-test.sh             applies migrations to a scratch Postgres and runs the RLS suite
+│  ├─ db-test.sh             runs each SQL suite in its own scratch Postgres database
+│  ├─ build-countries.ts     validates content and generates seed.sql (npm run content:build)
+│  └─ extract-natural-earth.py
 ├─ src/
 │  ├─ app/                   Expo Router routes only
 │  │  ├─ _layout.tsx
@@ -46,9 +52,10 @@ atlas-agency/
 │  └─ types/
 └─ supabase/
    ├─ config.toml            sign-up disabled; `app` schema not exposed
-   ├─ migrations/            0001 identity → 0005 RLS (see below)
+   ├─ migrations/            0001 identity → 0005 RLS → 0006 step-1 decisions
+   ├─ seed.sql               GENERATED: 18 NGS standards + 195 country documents
    ├─ functions/             create-students, student-sign-in, roster-sync, sync-events
-   └─ tests/                 00_supabase_stub.sql (CI only) + 10_rls.sql (67 assertions)
+   └─ tests/                 stub + helpers, 10_rls.sql (78 assertions), 20_seed.sql (14)
 ```
 
 ## Data model

@@ -33,6 +33,8 @@ export const Clue = z.object({
   /** 1 = concrete (K-2), 2 = descriptive (3-5), 3 = inferential (6-8). */
   difficulty: z.union([z.literal(1), z.literal(2), z.literal(3)]),
   text: Localized,
+  /** Standards this clue's skill supports (NGS now; TEKS once mapped). */
+  standardIds: z.array(StandardId).min(1),
 });
 export type Clue = z.infer<typeof Clue>;
 
@@ -40,7 +42,14 @@ export const Country = z.object({
   iso2: CountryCode,
   iso3: z.string().regex(/^[A-Z]{3}$/),
   name: Localized,
-  capital: z.object({ name: Localized, coord: LngLat }),
+  capital: z.object({
+    name: Localized,
+    coord: LngLat,
+    /** Other cities with a capital role (e.g. Bolivia: La Paz). Accepted as answers. */
+    alternates: z.array(Localized).optional(),
+    /** Shown on the country card where the capital is shared, split or disputed. */
+    note: Localized.optional(),
+  }),
   region: z.enum(['Africa', 'Americas', 'Asia', 'Europe', 'Oceania']),
   subregion: z.string().min(1),
   center: LngLat,
@@ -55,6 +64,13 @@ export const Country = z.object({
   facts: z.array(Localized).min(2).max(6),
   photo: LicensedMedia.optional(),
   clues: z.array(Clue).length(5),
+}).superRefine((c, ctx) => {
+  if (new Set(c.clues.map((k) => k.skill)).size !== c.clues.length) {
+    ctx.addIssue({ code: 'custom', path: ['clues'], message: 'each clue must cover a different skill' });
+  }
+  c.clues.forEach((k, i) => {
+    if (!k.id.startsWith(`${c.iso2}-`)) ctx.addIssue({ code: 'custom', path: ['clues', i, 'id'], message: 'clue id must start with the country code' });
+  });
 });
 export type Country = z.infer<typeof Country>;
 

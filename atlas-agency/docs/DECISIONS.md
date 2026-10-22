@@ -10,3 +10,4 @@
 | D6 | 2026-10-23 | Audio greetings and read-aloud use **on-device text-to-speech** (`expo-speech`). No recorded clips, no cloud TTS. | `country.greeting.ttsLang` |
 | D7 | 2026-10-23 | **Cross-class play groups need the second teacher's approval.** A teacher can only add their own students; a student from another class joins only when their teacher adds them. | `group_members_insert` policy (migration 0006) |
 | D8 | 2026-10-23 | Default retention: **365 days** of inactivity, configurable per school (30–1,095). | `schools.retention_days`, `app.purge_inactive_students()` |
+| D9 | 2026-10-23 | *(Proposed, awaiting approval)* The country list is the 193 UN member states plus the two UN observer states (Holy See, Palestine). Shared or disputed capitals carry a neutral `capital.note`, and alternates are accepted as answers. | `content/countries/source/*.ts` |
