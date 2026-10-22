@@ -1,0 +1,6 @@
+{
+  "app": { "name": "Atlas Agency", "tagline": "Track the thieves. Return the landmarks." },
+  "signIn": { "classCode": "Class code", "pickYourName": "Tap your agent name", "secret": "Your secret picture", "teacher": "I'm a teacher" },
+  "hq": { "title": "Agency HQ", "map": "World Map", "missions": "Cases", "review": "Memory Vault", "spelling": "Spelling Bee", "play": "Team Up", "passport": "Passport" },
+  "teacher": { "dashboard": "Teacher Dashboard", "classes": "Classes" }
+}

@@ -1,0 +1,25 @@
+# Supabase CLI config (local dev: `npx supabase start`, then `npx supabase db reset`).
+project_id = "atlas-agency"
+
+[api]
+enabled = true
+schemas = ["public"]          # `app` (RLS helpers) is deliberately NOT exposed
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+major_version = 17
+
+[realtime]
+enabled = true
+
+[auth]
+enabled = true
+# No self-service sign-up. Teachers are invited by a school admin or provisioned by
+# rostering; students are created by their teacher through the create-students function.
+enable_signup = false
+enable_anonymous_sign_ins = false
+jwt_expiry = 3600
+
+[auth.email]
+enable_signup = false

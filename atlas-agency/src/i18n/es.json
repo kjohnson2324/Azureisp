@@ -1,0 +1,6 @@
+{
+  "app": { "name": "Agencia Atlas", "tagline": "Rastrea a los ladrones. Devuelve los monumentos." },
+  "signIn": { "classCode": "Código de la clase", "pickYourName": "Toca tu nombre de agente", "secret": "Tu imagen secreta", "teacher": "Soy docente" },
+  "hq": { "title": "Cuartel de la Agencia", "map": "Mapa mundial", "missions": "Casos", "review": "Bóveda de memoria", "spelling": "Concurso de deletreo", "play": "En equipo", "passport": "Pasaporte" },
+  "teacher": { "dashboard": "Panel docente", "classes": "Clases" }
+}
