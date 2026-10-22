@@ -211,7 +211,7 @@ select test.throws('there is no free-text column to send',
 
 -- Realtime: receive-only
 select set_config('realtime.topic', 'room:' || :room1, false);
-select test.eq('S1 receives broadcasts for own room (join + 1 message)', (select count(*) from realtime.messages), 2);
+select test.eq('S1 receives broadcasts for own room (join + 1 message)', (select count(*) from realtime.messages where topic = realtime.topic()), 2);
 select test.throws('S1 cannot broadcast arbitrary payloads',
   $$insert into realtime.messages (topic, extension, payload) values (realtime.topic(), 'broadcast', '{"text":"hi"}')$$,
   '42501');
@@ -234,7 +234,7 @@ select test.eq('S3 cannot see the C1 room', (select count(*) from public.match_r
 select test.throws('S3 cannot join the C1 room',
   $$insert into public.match_players (room_id, student_id) values ('dddddddd-0000-0000-0000-000000000001', auth.uid())$$,
   '42501');
-select test.eq('S3 receives no broadcasts for the C1 room', (select count(*) from realtime.messages), 0);
+select test.eq('S3 receives no broadcasts for the C1 room', (select count(*) from realtime.messages where topic = realtime.topic()), 0);
 reset role;
 select set_config('realtime.topic', '', false);
 
@@ -295,6 +295,64 @@ select test.eq('Admin A sees all 3 School A students', (select count(*) from pub
 select test.eq('Admin A sees nothing from School B', (select count(*) from public.profiles where school_id = :school_b), 0);
 select test.ok('Admin A can set retention window',
   $$update public.schools set retention_days = 180 where id = 'aaaaaaaa-0000-0000-0000-000000000000'$$);
+reset role;
+
+-- ===========================================================================
+-- Decision: device-graded answers stream live to the class's teachers
+-- ===========================================================================
+select set_config('realtime.topic', 'class:' || :c1, false);
+select test.login(:t1);
+set role authenticated;
+select test.eq('T1 receives live answer feed for C1',
+  (select count(*) from realtime.messages where event = 'answer'), 2);
+reset role;
+select test.login(:t2);
+set role authenticated;
+select test.eq('T2 cannot receive C1 live feed', (select count(*) from realtime.messages), 0);
+reset role;
+select test.login(:s2);
+set role authenticated;
+select test.eq('students cannot receive the class feed', (select count(*) from realtime.messages), 0);
+reset role;
+select set_config('realtime.topic', '', false);
+select test.eq('live feed payload has no roster label or free text',
+  (select count(*) from realtime.messages where event = 'answer' and (payload ? 'label' or payload ? 'response')), 0);
+
+-- ===========================================================================
+-- Decision: cross-class groups need the second teacher's approval
+-- ===========================================================================
+\set g1 '''99999999-0000-0000-0000-000000000001'''
+select test.login(:t1);
+set role authenticated;
+select test.ok('T1 creates an approved play group',
+  $$insert into public.play_groups (id, school_id, name, created_by, approved_by, approved_at)
+    values ('99999999-0000-0000-0000-000000000001', 'aaaaaaaa-0000-0000-0000-000000000000',
+            'Map Masters', auth.uid(), auth.uid(), now())$$);
+select test.ok('T1 adds own student S1',
+  $$insert into public.play_group_members (group_id, student_id)
+    values ('99999999-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000a011')$$);
+select test.throws('T1 cannot add T2''s student S3 without T2',
+  $$insert into public.play_group_members (group_id, student_id)
+    values ('99999999-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000a013')$$, '42501');
+reset role;
+select test.login(:t2);
+set role authenticated;
+select test.ok('T2 approves by adding own student S3',
+  $$insert into public.play_group_members (group_id, student_id)
+    values ('99999999-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000a013')$$);
+select test.eq('T2 sees the group roster it contributes to',
+  (select count(*) from public.play_group_members where group_id = :g1), 2);
+reset role;
+select test.login(:tb);
+set role authenticated;
+select test.throws('other-school teacher cannot add to the group',
+  $$insert into public.play_group_members (group_id, student_id)
+    values ('99999999-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000b011')$$);
+reset role;
+select test.login(:s1);
+set role authenticated;
+select test.eq('S1 now sees group-mate S3 in peer_profiles',
+  (select count(*) from public.peer_profiles() where id = :s3), 1);
 reset role;
 
 -- ===========================================================================
