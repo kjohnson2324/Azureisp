@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -5,9 +6,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { layout, lightTheme as theme } from '@/theme/tokens';
 
 const SECTIONS = ['map', 'missions', 'review', 'spelling', 'play', 'passport'] as const;
+// Routes land step by step; tiles without a route yet are shown but disabled.
+const ROUTES: Partial<Record<(typeof SECTIONS)[number], '/map'>> = { map: '/map' };
 
 export default function AgencyHQ() {
   const { t } = useTranslation();
+  const router = useRouter();
   return (
     <SafeAreaView style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
@@ -20,7 +24,10 @@ export default function AgencyHQ() {
             key={s}
             accessibilityRole="button"
             accessibilityLabel={t(`hq.${s}`)}
-            style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
+            accessibilityState={{ disabled: !ROUTES[s] }}
+            disabled={!ROUTES[s]}
+            onPress={() => { const r = ROUTES[s]; if (r) router.push(r); }}
+            style={({ pressed }) => [styles.tile, pressed && styles.pressed, !ROUTES[s] && styles.disabled]}
           >
             <Text style={styles.tileLabel}>{t(`hq.${s}`)}</Text>
           </Pressable>
@@ -45,5 +52,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: layout.space(4),
   },
   pressed: { opacity: 0.7 },
+  disabled: { opacity: 0.45 },
   tileLabel: { fontSize: 20, fontWeight: '600', color: theme.text },
 });

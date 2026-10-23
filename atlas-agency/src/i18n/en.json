@@ -1,6 +1,65 @@
 {
-  "app": { "name": "Atlas Agency", "tagline": "Track the thieves. Return the landmarks." },
-  "signIn": { "classCode": "Class code", "pickYourName": "Tap your agent name", "secret": "Your secret picture", "teacher": "I'm a teacher" },
-  "hq": { "title": "Agency HQ", "map": "World Map", "missions": "Cases", "review": "Memory Vault", "spelling": "Spelling Bee", "play": "Team Up", "passport": "Passport" },
-  "teacher": { "dashboard": "Teacher Dashboard", "classes": "Classes" }
+  "app": {
+    "name": "Atlas Agency",
+    "tagline": "Track the thieves. Return the landmarks."
+  },
+  "signIn": {
+    "classCode": "Class code",
+    "pickYourName": "Tap your agent name",
+    "secret": "Your secret picture",
+    "teacher": "I'm a teacher"
+  },
+  "hq": {
+    "title": "Agency HQ",
+    "map": "World Map",
+    "missions": "Cases",
+    "review": "Memory Vault",
+    "spelling": "Spelling Bee",
+    "play": "Team Up",
+    "passport": "Passport"
+  },
+  "teacher": {
+    "dashboard": "Teacher Dashboard",
+    "classes": "Classes"
+  },
+  "map": {
+    "title": "World Map",
+    "mapView": "Map",
+    "listView": "List",
+    "search": "Search countries or capitals",
+    "hearGreeting": "Hear the greeting",
+    "readAloud": "Read aloud",
+    "stop": "Stop",
+    "close": "Close",
+    "capital": "Capital",
+    "languages": "Languages",
+    "currency": "Currency",
+    "facts": "Fun facts",
+    "greeting": "Say hello",
+    "photoComingSoon": "Photo coming soon",
+    "noVoice": "This device has no voice for that language, so you heard it in your own language.",
+    "backToWorld": "Whole world",
+    "loading": "Unfolding the map…",
+    "a11yMap": "World map. Tap a continent to zoom in, then tap a country. Screen reader users can switch to List.",
+    "noResults": "No countries match “{{query}}”.",
+    "downloads": "Offline maps",
+    "antarcticaTitle": "Antarctica",
+    "antarcticaSubtitle": "A continent with no countries",
+    "flagOf": "Flag of {{country}}"
+  },
+  "offline": {
+    "title": "Offline maps",
+    "intro": "The world map always works offline. Download a continent to get the newest facts and clues for every country there.",
+    "download": "Download",
+    "update": "Update",
+    "remove": "Remove",
+    "installed": "Ready offline",
+    "size": "{{size}}",
+    "contentOnly": "Facts and clues only (detailed map tiles coming later).",
+    "withTiles": "Facts, clues and detailed map.",
+    "noBackend": "Connect to your class to download.",
+    "failed": "Download failed. Check the connection and try again.",
+    "progress": "Downloading {{name}}: {{percent}}%",
+    "sharedDevice": "Downloads are saved on this device and contain no student information."
+  }
 }

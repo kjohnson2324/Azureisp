@@ -55,3 +55,7 @@ country becomes version 2, because published versions are immutable.
 - **Natural Earth**: public domain. https://www.naturalearthdata.com
 - **flag-icons**: MIT License, © 2013 Panayiotis Lipiridis. See `content/flags/LICENSE`.
 - **Unicode CLDR**: country, language and currency names. Unicode License v3, © 1991-2025 Unicode, Inc. https://www.unicode.org/license.txt
+- **Noto Sans** map label glyphs (via protomaps/basemaps-assets): SIL OFL 1.1. See `assets/map/glyphs/OFL.txt`.
+- **Atkinson Hyperlegible** (default UI font): SIL OFL 1.1, Braille Institute. Shipped via `@expo-google-fonts/atkinson-hyperlegible`.
+- **OpenDyslexic** (dyslexia font option): SIL OFL 1.1, © Abbie Gonzalez. See `assets/fonts/OpenDyslexic-OFL.txt`.
+- **MapLibre Native / GL JS**: BSD licenses (map rendering; GL JS is only used for the developer preview).

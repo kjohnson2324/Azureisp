@@ -1,6 +1,65 @@
 {
-  "app": { "name": "Agencia Atlas", "tagline": "Rastrea a los ladrones. Devuelve los monumentos." },
-  "signIn": { "classCode": "Código de la clase", "pickYourName": "Toca tu nombre de agente", "secret": "Tu imagen secreta", "teacher": "Soy docente" },
-  "hq": { "title": "Cuartel de la Agencia", "map": "Mapa mundial", "missions": "Casos", "review": "Bóveda de memoria", "spelling": "Concurso de deletreo", "play": "En equipo", "passport": "Pasaporte" },
-  "teacher": { "dashboard": "Panel docente", "classes": "Clases" }
+  "app": {
+    "name": "Agencia Atlas",
+    "tagline": "Rastrea a los ladrones. Devuelve los monumentos."
+  },
+  "signIn": {
+    "classCode": "Código de la clase",
+    "pickYourName": "Toca tu nombre de agente",
+    "secret": "Tu imagen secreta",
+    "teacher": "Soy docente"
+  },
+  "hq": {
+    "title": "Cuartel de la Agencia",
+    "map": "Mapa mundial",
+    "missions": "Casos",
+    "review": "Bóveda de memoria",
+    "spelling": "Concurso de deletreo",
+    "play": "En equipo",
+    "passport": "Pasaporte"
+  },
+  "teacher": {
+    "dashboard": "Panel docente",
+    "classes": "Clases"
+  },
+  "map": {
+    "title": "Mapa mundial",
+    "mapView": "Mapa",
+    "listView": "Lista",
+    "search": "Busca países o capitales",
+    "hearGreeting": "Escuchar el saludo",
+    "readAloud": "Leer en voz alta",
+    "stop": "Detener",
+    "close": "Cerrar",
+    "capital": "Capital",
+    "languages": "Idiomas",
+    "currency": "Moneda",
+    "facts": "Datos curiosos",
+    "greeting": "Saluda",
+    "photoComingSoon": "Foto próximamente",
+    "noVoice": "Este dispositivo no tiene voz para ese idioma, así que lo escuchaste en tu idioma.",
+    "backToWorld": "Todo el mundo",
+    "loading": "Desplegando el mapa…",
+    "a11yMap": "Mapa mundial. Toca un continente para acercarte y luego toca un país. Si usas lector de pantalla, cambia a Lista.",
+    "noResults": "Ningún país coincide con «{{query}}».",
+    "downloads": "Mapas sin conexión",
+    "antarcticaTitle": "Antártida",
+    "antarcticaSubtitle": "Un continente sin países",
+    "flagOf": "Bandera de {{country}}"
+  },
+  "offline": {
+    "title": "Mapas sin conexión",
+    "intro": "El mapa mundial siempre funciona sin conexión. Descarga un continente para tener los datos y pistas más nuevos de todos sus países.",
+    "download": "Descargar",
+    "update": "Actualizar",
+    "remove": "Eliminar",
+    "installed": "Listo sin conexión",
+    "size": "{{size}}",
+    "contentOnly": "Solo datos y pistas (los mapas detallados llegarán después).",
+    "withTiles": "Datos, pistas y mapa detallado.",
+    "noBackend": "Conéctate a tu clase para descargar.",
+    "failed": "La descarga falló. Revisa la conexión e inténtalo de nuevo.",
+    "progress": "Descargando {{name}}: {{percent}} %",
+    "sharedDevice": "Las descargas se guardan en este dispositivo y no contienen información de estudiantes."
+  }
 }

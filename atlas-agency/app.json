@@ -44,7 +44,9 @@
       "expo-sqlite",
       "expo-secure-store",
       "expo-font",
-      "@maplibre/maplibre-react-native"
+      "@maplibre/maplibre-react-native",
+      "expo-image",
+      "expo-asset"
     ],
     "scheme": "atlasagency",
     "experiments": {

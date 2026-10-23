@@ -16,13 +16,18 @@ export const palette = {
   white: '#FFFFFF',
 } as const;
 
-/** Map fills per continent (Okabe–Ito ordering; borders carry contrast, not fill). */
-export const regionFill = {
-  Africa: palette.orange,
-  Americas: palette.skyBlue,
-  Asia: palette.green,
-  Europe: palette.yellow,
-  Oceania: palette.purple,
+/**
+ * Map fills per continent (Okabe–Ito). Neighbouring continents never share a
+ * hue family, and every continent is also labelled, so colour is not the only cue.
+ */
+export const continentFill = {
+  africa: palette.orange,
+  asia: palette.green,
+  europe: palette.yellow,
+  'north-america': palette.skyBlue,
+  'south-america': palette.vermillion,
+  oceania: palette.purple,
+  antarctica: '#F2F5F7',
 } as const;
 
 export type Theme = Record<

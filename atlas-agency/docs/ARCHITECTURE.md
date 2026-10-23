@@ -21,6 +21,8 @@ sends a landmark home. Everything here (story, characters, names, art direction)
 ```
 atlas-agency/
 ├─ app.json                  Expo config. No ad ID, no location/camera/mic/contacts permissions
+├─ assets/map/               GENERATED offline world map: polygons, places, labels, glyph PBFs (docs/MAP.md)
+├─ assets/fonts/             OpenDyslexic (OFL)
 ├─ AGENTS.md                 Expo tooling notes for coding agents
 ├─ .env.example              EXPO_PUBLIC_SUPABASE_URL / _PUBLISHABLE_KEY
 ├─ content/
@@ -33,6 +35,8 @@ atlas-agency/
 ├─ docs/                     architecture, story bible, sample play, (step 9) privacy + a11y audits
 ├─ scripts/
 │  ├─ db-test.sh             runs each SQL suite in its own scratch Postgres database
+│  ├─ build-map-data.ts      Natural Earth → bundled map data + glyphs (npm run map:build)
+│  ├─ map-preview.ts         browser preview of the exact app map style
 │  ├─ build-countries.ts     validates content and generates seed.sql (npm run content:build)
 │  └─ extract-natural-earth.py
 ├─ src/
@@ -52,10 +56,10 @@ atlas-agency/
 │  └─ types/
 └─ supabase/
    ├─ config.toml            sign-up disabled; `app` schema not exposed
-   ├─ migrations/            0001 identity → 0005 RLS → 0006 step-1 decisions
+   ├─ migrations/            0001 identity → 0005 RLS → 0006 step-1 decisions → 0007 optional pack tiles
    ├─ seed.sql               GENERATED: 18 NGS standards + 195 country documents
    ├─ functions/             create-students, student-sign-in, roster-sync, sync-events
-   └─ tests/                 stub + helpers, 10_rls.sql (78 assertions), 20_seed.sql (14)
+   └─ tests/                 stub + helpers, 10_rls.sql (78 assertions), 20_seed.sql (18)
 ```
 
 ## Data model
@@ -117,7 +121,7 @@ Cross-school access is impossible for every role: all membership triggers assert
 ```bash
 cp .env.example .env.local      # fill in your Supabase project
 npm install
-npm run typecheck && npm test   # TS + content-contract tests
+npm run lint && npm run typecheck && npm test   # ESLint, TS, Jest (content, map, screens, offline)
 npm run db:test                 # needs psql + local Postgres 15+ (PG* env vars)
 npx expo start                  # MapLibre needs a dev build: npx expo run:ios | run:android
 ```

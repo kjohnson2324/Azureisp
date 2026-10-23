@@ -11,6 +11,8 @@ export type AppLocale = (typeof SUPPORTED_LOCALES)[number];
 const device = getLocales()[0]?.languageCode;
 const initial: AppLocale = device === 'es' ? 'es' : 'en';
 
+// i18next's documented setup: configure the default instance.
+// eslint-disable-next-line import/no-named-as-default-member
 void i18n.use(initReactI18next).init({
   resources: { en: { translation: en }, es: { translation: es } },
   lng: initial,
