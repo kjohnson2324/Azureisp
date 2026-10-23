@@ -35,3 +35,8 @@ jest.mock('expo-router', () => {
   const push = jest.fn();
   return { useRouter: () => ({ push, back: jest.fn() }), Redirect: () => null, Stack: () => null };
 });
+
+jest.mock('expo-crypto', () => {
+  let n = 0;
+  return { randomUUID: () => `00000000-0000-4000-8000-${String(++n).padStart(12, '0')}` };
+});

@@ -17,17 +17,19 @@ export const formatBytes = (n: number, locale: Locale) =>
     ? `${new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(n / 1024)} KB`
     : `${new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(n / 1024 / 1024)} MB`;
 
-export function DownloadsScreen({ load }: { load: () => Promise<OfflineRuntime> }) {
+type PackRuntime = Pick<OfflineRuntime, 'cache' | 'api' | 'tiles'>;
+
+export function DownloadsScreen({ load }: { load: () => Promise<PackRuntime> }) {
   const { t, i18n } = useTranslation();
   const locale: Locale = i18n.language === 'es' ? 'es' : 'en';
   const { colors } = useAppTheme();
-  const [rt, setRt] = useState<OfflineRuntime>();
+  const [rt, setRt] = useState<PackRuntime>();
   const [packs, setPacks] = useState<RegionPackInfo[]>([]);
   const [installed, setInstalled] = useState<InstalledPack[]>([]);
   const [busy, setBusy] = useState<{ id: string; percent: number }>();
   const [error, setError] = useState<string>();
 
-  const refresh = useCallback(async (r: OfflineRuntime) => {
+  const refresh = useCallback(async (r: PackRuntime) => {
     setInstalled(await r.cache.getInstalledPacks());
     if (r.api) setPacks(await r.api.listRegionPacks());
   }, []);

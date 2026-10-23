@@ -24,7 +24,7 @@ for f in supabase/tests/[1-9][0-9]_*.sql; do
   n=$((n + 1))
   db=$(fresh_db "$n")
   echo "test     $(basename "$f")"
-  if [[ "$f" == *seed* ]]; then "${PSQL[@]}" -d "$db" -f supabase/seed.sql; fi
+  if [[ "$f" == *seed* ]]; then "${PSQL[@]}" -d "$db" -f supabase/seed.sql -f supabase/seed_missions.sql; fi
   out=$("${PSQL[@]}" -d "$db" -f "$f" 2>&1) || { echo "$out"; status=1; continue; }
   echo "$out" | grep -E 'PASS|FAIL' | sed 's/^.*NOTICE:  /  /'
   if echo "$out" | grep -q 'FAIL'; then status=1; fi

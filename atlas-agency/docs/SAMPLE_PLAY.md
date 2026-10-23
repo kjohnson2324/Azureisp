@@ -1,4 +1,4 @@
-# Sample play-through: "The Case of the Vanishing Tower"
+# Sample play-through (step-1 mock-up; see SAMPLE_CASE.md for real engine output)
 
 Source data: `content/samples/mission.vanishing-tower.json` (grade band 3–5, NGS 1 · 4 · 10).
 Player: **Agent BraveOtter42**, Room 12 Geography, read-aloud ON, untimed.

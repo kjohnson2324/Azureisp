@@ -9,6 +9,7 @@
     "expo": "~58.0.17",
     "expo-asset": "~58.0.18",
     "expo-constants": "~58.0.13",
+    "expo-crypto": "~58.0.7",
     "expo-file-system": "~58.0.10",
     "expo-font": "~58.0.9",
     "expo-image": "~58.0.16",
@@ -55,7 +56,8 @@
     "content:build": "tsx scripts/build-countries.ts",
     "content:check": "tsx scripts/build-countries.ts --check",
     "map:build": "tsx scripts/build-map-data.ts",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "missions:build": "tsx scripts/build-missions.ts"
   },
   "private": true,
   "jest": {

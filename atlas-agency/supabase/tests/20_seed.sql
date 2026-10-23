@@ -39,6 +39,18 @@ select test.throws('tile fields are all-or-nothing',
   $$insert into public.region_packs (id, version, status, name_en, name_es, bbox, manifest, tiles_path)
     values ('half', 1, 'draft', 'Half', 'Mitad', '{0,0,1,1}', '[]', 'tiles/half.pmtiles')$$, '23514');
 
+-- Case library
+select test.eq('121 missions seeded (40 per band + the sample)', (select count(*) from public.content_items where kind = 'mission'), 121);
+select test.eq('every mission is tagged with a grade band and a standard',
+  (select count(*) from public.content_items where kind = 'mission' and cardinality(grade_bands) > 0 and cardinality(standard_ids) > 0), 121);
+select test.eq('40 missions per grade band',
+  (select count(*) from (select unnest(grade_bands) b, count(*) n from public.content_items where kind = 'mission' and id like 'mission:g%' group by 1) x where n = 40), 3);
+select test.eq('missions have 3 to 5 stops',
+  (select count(*) from public.content_items where kind = 'mission' and jsonb_array_length(data->'stops') between 3 and 5), 121);
+select test.eq('K-2 cases are 3 stops with 2 choices',
+  (select count(*) from public.content_items where kind = 'mission' and grade_bands = '{K-2}'
+     and jsonb_array_length(data->'stops') = 3 and jsonb_array_length(data->'stops'->0->'choices') = 2), 40);
+
 -- Students can read published country content.
 insert into public.schools (id, name) values ('aaaaaaaa-0000-0000-0000-000000000000', 'Seed School');
 insert into auth.users (id) values ('00000000-0000-0000-0000-00000000a011');
@@ -48,6 +60,7 @@ select test.login('00000000-0000-0000-0000-00000000a011');
 set role authenticated;
 select test.eq('a student can read all 195 countries', (select count(*) from public.content_current where kind = 'country'), 195);
 select test.eq('a student can list the published region packs', (select count(*) from public.region_packs), 6);
+select test.eq('a student can read the case library', (select count(*) from public.content_current where kind = 'mission'), 121);
 select test.eq('a student can look up a clue by id',
   (select count(*) from public.content_current, jsonb_array_elements(data->'clues') c
     where id = 'country:JP' and c->>'id' = 'JP-food-1'), 1);

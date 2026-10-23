@@ -54,7 +54,8 @@ const fail = (iso2: string, msg: string) => errors.push(`${iso2}: ${msg}`);
 const loc = ([en, es]: L) => ({ en, es });
 const pair = (v: string | L): L => (typeof v === 'string' ? [v, v] : v);
 const capFirst = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-const lowerFirst = (s: string) => (/^[A-Z][a-z]/.test(s) ? s.charAt(0).toLowerCase() + s.slice(1) : s);
+// "Three vertical…" → "three vertical…", "A white cross…" → "a white cross…"; leaves acronyms alone.
+const lowerFirst = (s: string) => (/^[A-Z]([a-z]| )/.test(s) ? s.charAt(0).toLowerCase() + s.slice(1) : s);
 const fold = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
 
 function cldrName(kind: 'region' | 'language' | 'currency', code: string, iso2: string): L {

@@ -107,6 +107,8 @@ export const Mission = z
     }),
     timer: z.object({ secondsPerStop: z.number().int().min(30).nullable() }),
     stamp: z.string().regex(/^stamp:[A-Z]{2}$/),
+    /** Extra clue computed from the map: none, "flew east", or "flew about 5,600 miles east". */
+    travel: z.enum(['none', 'direction', 'directionDistance']).default('none'),
   })
   .superRefine((m, ctx) => {
     m.stops.forEach((stop, i) => {

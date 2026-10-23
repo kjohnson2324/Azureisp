@@ -7,7 +7,7 @@ import { layout, lightTheme as theme } from '@/theme/tokens';
 
 const SECTIONS = ['map', 'missions', 'review', 'spelling', 'play', 'passport'] as const;
 // Routes land step by step; tiles without a route yet are shown but disabled.
-const ROUTES: Partial<Record<(typeof SECTIONS)[number], '/map'>> = { map: '/map' };
+const ROUTES: Partial<Record<(typeof SECTIONS)[number], '/map' | '/missions'>> = { map: '/map', missions: '/missions' };
 
 export default function AgencyHQ() {
   const { t } = useTranslation();

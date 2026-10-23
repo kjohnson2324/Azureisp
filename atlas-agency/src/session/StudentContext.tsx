@@ -9,6 +9,8 @@ export interface ClassTrip {
 }
 
 export interface StudentSession {
+  /** auth user id once signed in; "local" before sign-in exists (evidence then stays on the device). */
+  studentId?: string;
   gradeBand: GradeBand;
   classTrip?: ClassTrip;
 }
