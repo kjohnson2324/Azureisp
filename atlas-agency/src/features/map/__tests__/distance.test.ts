@@ -1,5 +1,5 @@
 import {
-  compareToSchoolTrips, distanceKm, formatDistance, formatNumber, fromUnit, greatCircle, KM_PER_MILE, nearestChoice,
+  compareToSchoolTrips, compareToWalking, distanceKm, formatDistance, formatNumber, fromUnit, greatCircle, KM_PER_MILE, nearestChoice,
 } from '../distance';
 
 const LONDON: [number, number] = [-0.1278, 51.5074];
@@ -72,5 +72,13 @@ describe('school-to-home comparison', () => {
     expect(nearestChoice(2, 'imperial')).toBe(1);
     expect(nearestChoice(fromUnit(3, 'imperial'), 'imperial')).toBe(3);
     expect(nearestChoice(3 * KM_PER_MILE, 'metric')).toBe(5);
+  });
+});
+
+describe('K-2 walking comparison', () => {
+  it('picks minutes, hours or days at a gentle 4 km/h', () => {
+    expect(compareToWalking(1, 'en')).toEqual({ unit: 'minutes', count: '15' });
+    expect(compareToWalking(20, 'en')).toEqual({ unit: 'hours', count: '5' });
+    expect(compareToWalking(5570, 'en')).toEqual({ unit: 'days', count: '58' });
   });
 });

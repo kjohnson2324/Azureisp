@@ -3,12 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import {
-  compareToSchoolTrips, distanceKm, formatDistance, formatNumber, fromUnit, nearestChoice, SCHOOL_TRIP_CHOICES, type Units,
+  compareToSchoolTrips, compareToWalking, distanceKm, formatDistance, formatNumber, fromUnit, KID_WALKING_KMH, nearestChoice,
+  SCHOOL_TRIP_CHOICES, toUnit, type Units,
 } from './distance';
 import { placePoint, pointLabel, searchPlaces, type MeasurePoint } from './measure';
 import { usePreferences, useAppTheme, useUnits } from '@/a11y/PreferencesContext';
 import { speakAll } from '@/a11y/speech';
 import { countryRepository, type Locale } from '@/content/countries';
+import { useStudent } from '@/session/StudentContext';
 import { layout } from '@/theme/tokens';
 import { AppText } from '@/ui/AppText';
 import { Button } from '@/ui/Button';
@@ -21,7 +23,11 @@ interface Props {
   onDone: () => void;
 }
 
-/** How far apart two places are, and how many school-to-home round trips that equals. */
+/**
+ * How far apart two places are, compared with something familiar:
+ *   K-2:  how long it would take to walk there
+ *   3-8:  round trips on the class trip (teacher-set) or the student's own trip home
+ */
 export function MeasurePanel({ locale, from, to, onChange, onDone }: Props) {
   const { t } = useTranslation();
   const { prefs, update } = usePreferences();
@@ -30,24 +36,45 @@ export function MeasurePanel({ locale, from, to, onChange, onDone }: Props) {
   const repo = countryRepository();
   const label = (p: MeasurePoint) => pointLabel(p, locale, repo, t);
 
+  const { gradeBand, classTrip } = useStudent();
+  const useClassTrip = !!classTrip && prefs.tripReference === 'class' && gradeBand !== 'K-2';
+
   const result = useMemo(() => {
     if (!from || !to) return undefined;
     const km = distanceKm(from.coord, to.coord);
     const unitLabel = (v: number, u: Units) => (u === 'metric' ? `${formatNumber(v, locale)} km` : `${formatNumber(v, locale)} ${locale === 'es' ? (v === 1 ? 'milla' : 'millas') : v === 1 ? 'mile' : 'miles'}`);
+    const distance = formatDistance(km, units, locale);
+
+    if (gradeBand === 'K-2') {
+      const walk = compareToWalking(km, locale);
+      const speed = units === 'metric' ? `${formatNumber(KID_WALKING_KMH, locale)} km/h` : `${formatNumber(toUnit(KID_WALKING_KMH, 'imperial'), locale)} mph`;
+      return { distance, icon: '🚶', comparison: t(`measure.walk_${walk.unit}`, { count: walk.count }), assumption: t('measure.walkAssumption', { speed }) };
+    }
+    if (useClassTrip && classTrip) {
+      const place = (locale === 'es' ? classTrip.place.es : undefined) ?? classTrip.place.en;
+      const trips = compareToSchoolTrips(km, classTrip.km, locale);
+      return {
+        distance,
+        icon: '🏫 ↔ 📍',
+        comparison: t(`measure.classTrips_${trips.kind}`, { count: trips.count, place }),
+        assumption: t('measure.classTripAssumption', { place, trip: unitLabel(Number(toUnit(classTrip.km, units).toFixed(1)), units) }),
+      };
+    }
     // Count with exactly the distance the student sees ("about 1 mile"), not a hidden km value.
     const tripChoice = nearestChoice(prefs.schoolTripKm, units);
     const trips = compareToSchoolTrips(km, fromUnit(tripChoice, units), locale);
     return {
-      distance: formatDistance(km, units, locale),
-      trips: t(`measure.trips_${trips.kind}`, { count: trips.count }),
+      distance,
+      icon: '🏫 ↔ 🏠',
+      comparison: t(`measure.trips_${trips.kind}`, { count: trips.count }),
       assumption: t('measure.tripAssumption', { trip: unitLabel(tripChoice, units) }),
     };
-  }, [from, to, units, locale, prefs.schoolTripKm, t]);
+  }, [from, to, units, locale, prefs.schoolTripKm, gradeBand, useClassTrip, classTrip, t]);
 
   const speakResult = () => {
     if (!from || !to || !result) return;
     void speakAll(
-      [t('measure.a11yResult', { from: label(from), to: label(to), distance: `${result.distance.primary}, ${result.distance.secondary}` }), result.trips, result.assumption],
+      [t('measure.a11yResult', { from: label(from), to: label(to), distance: `${result.distance.primary}, ${result.distance.secondary}` }), result.comparison, result.assumption],
       locale,
       prefs,
     );
@@ -72,7 +99,7 @@ export function MeasurePanel({ locale, from, to, onChange, onDone }: Props) {
             <AppText variant="caption" muted>{t('measure.distance')}</AppText>
             <AppText variant="title">{result.distance.primary}</AppText>
             <AppText muted>{result.distance.secondary}</AppText>
-            <AppText variant="heading" style={styles.trips}>{`🏫 ↔ 🏠  ${result.trips}`}</AppText>
+            <AppText variant="heading" style={styles.trips}>{`${result.icon}  ${result.comparison}`}</AppText>
             <AppText variant="caption" muted>{result.assumption}</AppText>
           </View>
         ) : null}
@@ -84,15 +111,29 @@ export function MeasurePanel({ locale, from, to, onChange, onDone }: Props) {
         </View>
 
         <View style={styles.settings}>
-          <AppText variant="heading">{t('measure.schoolTrip')}</AppText>
-          <AppText variant="caption" muted>{t('measure.schoolTripHint')}</AppText>
-          <View style={styles.chips} accessibilityRole="radiogroup">
-            {SCHOOL_TRIP_CHOICES[units].map((v) => (
-              <Chip key={v} selected={nearestChoice(prefs.schoolTripKm, units) === v}
-                label={units === 'metric' ? `${formatNumber(v, locale)} km` : `${formatNumber(v, locale)} mi`}
-                onPress={() => update({ schoolTripKm: fromUnit(v, units) })} />
-            ))}
-          </View>
+          {gradeBand !== 'K-2' && classTrip ? (
+            <>
+              <AppText variant="heading">{t('measure.compareWith')}</AppText>
+              <View style={styles.chips} accessibilityRole="radiogroup">
+                <Chip selected={useClassTrip} label={`${t('measure.ourClassTrip')} (${(locale === 'es' ? classTrip.place.es : undefined) ?? classTrip.place.en})`}
+                  onPress={() => update({ tripReference: 'class' })} />
+                <Chip selected={!useClassTrip} label={t('measure.myTripHome')} onPress={() => update({ tripReference: 'home' })} />
+              </View>
+            </>
+          ) : null}
+          {gradeBand !== 'K-2' && !useClassTrip ? (
+            <>
+              <AppText variant="heading">{t('measure.schoolTrip')}</AppText>
+              <AppText variant="caption" muted>{t('measure.schoolTripHint')}</AppText>
+              <View style={styles.chips} accessibilityRole="radiogroup">
+                {SCHOOL_TRIP_CHOICES[units].map((v) => (
+                  <Chip key={v} selected={nearestChoice(prefs.schoolTripKm, units) === v}
+                    label={units === 'metric' ? `${formatNumber(v, locale)} km` : `${formatNumber(v, locale)} mi`}
+                    onPress={() => update({ schoolTripKm: fromUnit(v, units) })} />
+                ))}
+              </View>
+            </>
+          ) : null}
           <View style={styles.chips} accessibilityRole="radiogroup">
             <Chip selected={units === 'imperial'} label={locale === 'es' ? 'Millas' : 'Miles'} onPress={() => update({ units: 'imperial' })} />
             <Chip selected={units === 'metric'} label={locale === 'es' ? 'Kilómetros' : 'Kilometers'} onPress={() => update({ units: 'metric' })} />

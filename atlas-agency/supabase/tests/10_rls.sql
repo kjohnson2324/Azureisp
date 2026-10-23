@@ -310,6 +310,27 @@ select test.eq('S1 now sees group-mate S3 in peer_profiles',
 reset role;
 
 -- ===========================================================================
+-- Class trip reference (distance tool)
+-- ===========================================================================
+select test.login(:t1);
+set role authenticated;
+select test.ok('T1 sets the class trip for C1',
+  $$update public.classes set trip_place_en = 'the public library', trip_place_es = 'la biblioteca pública', trip_km = 1.5
+    where id = 'cccccccc-0000-0000-0000-000000000001'$$);
+select test.affected('T1 cannot set the trip for C2', $$update public.classes set trip_place_en = 'x', trip_km = 1
+    where id = 'cccccccc-0000-0000-0000-000000000002'$$, 0);
+select test.throws('a trip needs both a place and a distance',
+  $$update public.classes set trip_km = null where id = 'cccccccc-0000-0000-0000-000000000001'$$, '23514');
+reset role;
+select test.login(:s2);
+set role authenticated;
+select test.eq('students in C1 can read the class trip',
+  (select count(*) from public.classes where trip_place_en = 'the public library' and trip_km = 1.5), 1);
+select test.affected('students cannot change the class trip (RLS hides the row from updates)',
+  $$update public.classes set trip_km = 3 where id = 'cccccccc-0000-0000-0000-000000000001'$$, 0);
+reset role;
+
+-- ===========================================================================
 -- Data deletion by S1's teacher
 -- ===========================================================================
 select test.login(:t1);

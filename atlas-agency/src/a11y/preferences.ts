@@ -16,6 +16,8 @@ export const Preferences = z.object({
    * DEVICE-ONLY: never synced (see syncablePreferences). No address, no GPS.
    */
   schoolTripKm: z.number().positive().max(50).default(2),
+  /** Compare distances with the class trip (when the teacher set one) or the student's own trip home. */
+  tripReference: z.enum(['class', 'home']).default('class'),
 });
 export type Preferences = z.infer<typeof Preferences>;
 

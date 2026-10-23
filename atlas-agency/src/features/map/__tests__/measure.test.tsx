@@ -4,10 +4,11 @@ import i18n from '@/i18n';
 import { PreferencesProvider } from '@/a11y/PreferencesContext';
 import { defaultPreferences, syncablePreferences } from '@/a11y/preferences';
 import { countryRepository } from '@/content/countries';
-import { compareToSchoolTrips, distanceKm, KM_PER_MILE } from '../distance';
+import { compareToSchoolTrips, compareToWalking, distanceKm, KM_PER_MILE } from '../distance';
 import { MapScreen } from '../MapScreen';
 import { measurePointFromTap, placePoint, pointLabel, searchPlaces } from '../measure';
 import { MeasurePanel } from '../MeasurePanel';
+import { StudentProvider, type StudentSession } from '@/session/StudentContext';
 
 jest.mock('../glyphs', () => ({ prepareGlyphs: async () => 'file:///glyphs' }));
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -103,6 +104,45 @@ describe('MeasurePanel', () => {
     await render(wrap(<MeasurePanel locale="es" from={nairobi} to={tokyo} onChange={() => {}} onDone={() => {}} />, { units: 'metric', schoolTripKm: 2 }));
     expect(screen.getByText(/¡Es como ir de la escuela a la casa y volver unas [\d,]+ veces!/)).toBeTruthy();
     expect(screen.getByText('(si la escuela está a unos 2 km de tu casa)')).toBeTruthy();
+  });
+});
+
+describe('MeasurePanel by grade band and class trip', () => {
+  const nairobi = placePoint('capital:KE')!;
+  const tokyo = placePoint('capital:JP')!;
+  const km = distanceKm(nairobi.coord, tokyo.coord);
+  const withStudent = (session: StudentSession, prefs = {}) =>
+    wrap(<StudentProvider value={session}><MeasurePanel locale={i18n.language as 'en'} from={nairobi} to={tokyo} onChange={() => {}} onDone={() => {}} /></StudentProvider>, prefs);
+  const libraryTrip = { place: { en: 'the public library', es: 'la biblioteca pública' }, km: 1.5 };
+
+  it('K-2 students see walking time instead of round trips, and no school-distance question', async () => {
+    await render(withStudent({ gradeBand: 'K-2' }, { units: 'imperial' }));
+    const walk = compareToWalking(km, 'en');
+    expect(screen.getByText(`🚶  Walking without stopping, day and night, that would take about ${walk.count} days!`)).toBeTruthy();
+    expect(screen.getByText("(at a kid's walking speed, about 2.5 mph)")).toBeTruthy();
+    expect(screen.queryByText('How far is school from home?')).toBeNull();
+  });
+
+  it('uses the class trip by default when the teacher set one', async () => {
+    await render(withStudent({ gradeBand: '3-5', classTrip: libraryTrip }, { units: 'metric' }));
+    const n = compareToSchoolTrips(km, 1.5, 'en').count;
+    expect(screen.getByText(`🏫 ↔ 📍  That's like going from school to the public library and back about ${n} times!`)).toBeTruthy();
+    expect(screen.getByText('(school to the public library is about 1.5 km)')).toBeTruthy();
+    expect(screen.queryByText('How far is school from home?')).toBeNull();
+  });
+
+  it('lets the student switch to their own trip home', async () => {
+    const user = userEvent.setup();
+    await render(withStudent({ gradeBand: '6-8', classTrip: libraryTrip }, { units: 'metric', schoolTripKm: 2 }));
+    await user.press(screen.getByRole('radio', { name: 'My trip home' }));
+    expect(screen.getByText('How far is school from home?')).toBeTruthy();
+    expect(screen.getByText(new RegExp(`school to home and back about ${compareToSchoolTrips(km, 2, 'en').count} times`))).toBeTruthy();
+  });
+
+  it('uses the Spanish place name when the teacher gave one', async () => {
+    await act(() => i18n.changeLanguage('es'));
+    await render(withStudent({ gradeBand: '3-5', classTrip: libraryTrip }, { units: 'metric' }));
+    expect(screen.getByText(/de la escuela a la biblioteca pública y volver unas [\d,]+ veces/)).toBeTruthy();
   });
 });
 

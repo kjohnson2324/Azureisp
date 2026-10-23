@@ -83,6 +83,17 @@
     "clear": "Borrar",
     "done": "Listo",
     "swap": "Invertir",
-    "a11yResult": "Desde {{from}} hasta {{to}}: {{distance}}."
+    "a11yResult": "Desde {{from}} hasta {{to}}: {{distance}}.",
+    "walk_minutes": "Caminando sin parar, tardarías unos {{count}} minutos.",
+    "walk_hours": "Caminando sin parar, tardarías unas {{count}} horas.",
+    "walk_days": "Caminando sin parar, de día y de noche, tardarías unos {{count}} días.",
+    "walkAssumption": "(al paso de un niño o niña, unos {{speed}})",
+    "classTrips_many": "¡Es como ir de la escuela a {{place}} y volver unas {{count}} veces!",
+    "classTrips_once": "¡Es como ir de la escuela a {{place}} y volver una vez!",
+    "classTrips_lessThanOne": "Es menos que un viaje de ida y vuelta entre la escuela y {{place}}.",
+    "classTripAssumption": "(de la escuela a {{place}} hay unos {{trip}})",
+    "compareWith": "Comparar con",
+    "ourClassTrip": "El viaje de la clase",
+    "myTripHome": "Mi viaje a casa"
   }
 }

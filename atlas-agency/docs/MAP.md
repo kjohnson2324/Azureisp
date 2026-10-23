@@ -40,6 +40,10 @@
   - **Back and forth** means one round trip, which is twice the one-way distance.
   - **The count** uses exactly the distance shown, for example "about 1 mile".
   - **Rounding:** counts under 10 show one decimal, and larger counts are whole numbers.
+- **By grade band:**
+  - **K-2** sees walking time instead: *"Walking without stopping, day and night, that would take about 117 days!"* This uses a gentle 4 km/h (2.5 mph) kid's pace and needs no settings.
+  - **Grades 3-8** compare with the **class trip** when the teacher has set one, e.g. *"school to the public library and back about 3,750 times"*. Otherwise, or if the student switches, they compare with their own trip home.
+- **Class trip:** a public place near school and its distance (`classes.trip_place_en/_es`, `trip_km`, migration 0008). Only the class's teachers can set it; students in the class can read it. Editing it comes with the teacher dashboard (step 8).
 - **Privacy:** the school-to-home distance is a rough value chosen from a short list (¼ mi to 10 mi, or 0.5 km to 20 km). The app never asks for an address and never uses GPS. The value is **device-only**: `syncablePreferences()` strips it before anything is saved to the server, and a test enforces this.
 
 ## Offline and privacy

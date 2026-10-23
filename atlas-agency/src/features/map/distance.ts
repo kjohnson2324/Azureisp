@@ -107,3 +107,19 @@ export function compareToSchoolTrips(km: number, schoolTripKm: number, locale: '
   if (shown === 1) return { roundTrips, kind: 'once', count: '1' };
   return { roundTrips, kind: 'many', count: formatNumber(shown, locale) };
 }
+
+/** Young children's walking pace without stops (km/h); deliberately gentle. */
+export const KID_WALKING_KMH = 4;
+
+export interface WalkingComparison {
+  unit: 'minutes' | 'hours' | 'days';
+  count: string;
+}
+
+/** K-2 comparison: how long it would take to walk there without stopping. */
+export function compareToWalking(km: number, locale: 'en' | 'es'): WalkingComparison {
+  const hours = km / KID_WALKING_KMH;
+  if (hours < 1) return { unit: 'minutes', count: formatNumber(Math.max(1, Math.round(hours * 60)), locale) };
+  if (hours < 24) return { unit: 'hours', count: formatNumber(Math.round(hours), locale) };
+  return { unit: 'days', count: formatNumber(Math.round(hours / 24), locale) };
+}

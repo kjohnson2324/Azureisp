@@ -83,6 +83,17 @@
     "clear": "Clear",
     "done": "Done",
     "swap": "Swap",
-    "a11yResult": "From {{from}} to {{to}}: {{distance}}."
+    "a11yResult": "From {{from}} to {{to}}: {{distance}}.",
+    "walk_minutes": "Walking without stopping, that would take about {{count}} minutes!",
+    "walk_hours": "Walking without stopping, that would take about {{count}} hours!",
+    "walk_days": "Walking without stopping, day and night, that would take about {{count}} days!",
+    "walkAssumption": "(at a kid's walking speed, about {{speed}})",
+    "classTrips_many": "That's like going from school to {{place}} and back about {{count}} times!",
+    "classTrips_once": "That's like going from school to {{place}} and back once!",
+    "classTrips_lessThanOne": "That's shorter than one trip from school to {{place}} and back.",
+    "classTripAssumption": "(school to {{place}} is about {{trip}})",
+    "compareWith": "Compare with",
+    "ourClassTrip": "Our class trip",
+    "myTripHome": "My trip home"
   }
 }
