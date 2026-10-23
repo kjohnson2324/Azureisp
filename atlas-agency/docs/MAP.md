@@ -26,6 +26,22 @@
 
 **List view:** the same countries grouped by continent, searchable in English or Spanish and ignoring accents. It opens the same cards. It is the default when a screen reader is on.
 
+## Measuring distance
+
+![Measuring Mexico City to Madrid](screenshots/measure-mexico-madrid.png)
+
+- **📏 Measure** works on the map and in the list view.
+  - **On the map:** tap two points. A tap snaps to a capital or city when one is under the finger. Otherwise it marks the exact spot ("A spot in Brazil" or "A spot in the ocean").
+  - **Search:** both endpoints can be picked by name in English or Spanish, so the tool works with a screen reader.
+  - **From a card:** "📏 Measure from here" starts from that place.
+- **The path:** the map draws the shortest route over the globe, the way planes fly. Routes that cross the 180° line are split so both halves show.
+- **The distance:** shown as the crow flies, in **both miles and kilometres**. The unit shown first follows the device setting, and the student can switch it.
+- **The comparison:** *"That's like going from school to home and back about 2,816 times!"*
+  - **Back and forth** means one round trip, which is twice the one-way distance.
+  - **The count** uses exactly the distance shown, for example "about 1 mile".
+  - **Rounding:** counts under 10 show one decimal, and larger counts are whole numbers.
+- **Privacy:** the school-to-home distance is a rough value chosen from a short list (¼ mi to 10 mi, or 0.5 km to 20 km). The app never asks for an address and never uses GPS. The value is **device-only**: `syncablePreferences()` strips it before anything is saved to the server, and a test enforces this.
+
 ## Offline and privacy
 
 - The whole-world map ships in the app: 232 KB of polygons, 71 KB of places and 740 KB of label glyphs. It works in airplane mode from first launch. **No map tiles are requested from any third party.**

@@ -2,7 +2,7 @@
 // Writes a self-contained browser preview of the app's map style (MapLibre GL JS
 // renders the same style spec as MapLibre Native).
 //
-//   npx tsx scripts/map-preview.ts <out-dir> [en|es] [--high-contrast] [--dark]
+//   npx tsx scripts/map-preview.ts <out-dir> [en|es] [--high-contrast] [--dark] [--measure=capital:MX,capital:ES]
 //   python3 -m http.server -d <out-dir> 8765   then open http://localhost:8765/
 //
 // URL hash selects the view, e.g. #zoom=1.2&center=10,20 or #bounds=-170,-58,180,75
@@ -10,7 +10,9 @@ import { cpSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildMapStyle } from '../src/features/map/style';
+import { greatCircle } from '../src/features/map/distance';
+import { measureGeoJSON, placePoint } from '../src/features/map/measure';
+import { buildMapStyle, measureLayers } from '../src/features/map/style';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const [out, locale = 'en'] = process.argv.slice(2).filter((a) => !a.startsWith('--'));
@@ -33,6 +35,22 @@ const style = buildMapStyle({
   highContrast: flags.has('--high-contrast'),
   dark: flags.has('--dark'),
 });
+// Optional measurement overlay, drawn with the same layers the app uses.
+const measureArg = process.argv.find((a) => a.startsWith('--measure='));
+if (measureArg) {
+  const [a, b] = measureArg.slice('--measure='.length).split(',').map((id) => placePoint(id)!);
+  const name = (p: typeof a) => (p!.kind === 'place' ? p!.name[locale === 'es' ? 'es' : 'en'] : '');
+  const geo = measureGeoJSON(a, b, greatCircle(a!.coord, b!.coord), [`A · ${name(a)}`, `B · ${name(b)}`]);
+  const layers = measureLayers(flags.has('--dark'));
+  style.sources.measureLine = { type: 'geojson', data: geo.line };
+  style.sources.measurePoints = { type: 'geojson', data: geo.points };
+  style.layers.push(
+    { ...layers.casing, source: 'measureLine' } as never,
+    { ...layers.line, source: 'measureLine' } as never,
+    { ...layers.points, source: 'measurePoints' } as never,
+    { ...layers.labels, source: 'measurePoints' } as never,
+  );
+}
 writeFileSync(join(out, 'style.json'), JSON.stringify(style));
 writeFileSync(join(out, 'index.html'), `<!doctype html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">

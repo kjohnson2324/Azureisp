@@ -61,5 +61,28 @@
     "failed": "La descarga falló. Revisa la conexión e inténtalo de nuevo.",
     "progress": "Descargando {{name}}: {{percent}} %",
     "sharedDevice": "Las descargas se guardan en este dispositivo y no contienen información de estudiantes."
+  },
+  "measure": {
+    "measure": "Medir",
+    "measureHint": "Toca dos lugares en el mapa o búscalos abajo.",
+    "from": "Desde",
+    "to": "Hasta",
+    "pickPlace": "Busca un lugar",
+    "change": "Cambiar",
+    "distance": "Distancia en línea recta",
+    "line": "El camino más corto sobre el globo",
+    "trips_many": "¡Es como ir de la escuela a la casa y volver unas {{count}} veces!",
+    "trips_once": "¡Es como ir de la escuela a la casa y volver una vez!",
+    "trips_lessThanOne": "Es menos que un viaje de ida y vuelta entre la escuela y la casa.",
+    "tripAssumption": "(si la escuela está a unos {{trip}} de tu casa)",
+    "schoolTrip": "¿Qué tan lejos está la escuela de tu casa?",
+    "schoolTripHint": "¡Pregúntale a una persona adulta! Esto se queda en este dispositivo.",
+    "spotIn": "Un lugar en {{country}}",
+    "oceanSpot": "Un lugar en el océano",
+    "measureFromHere": "Medir desde aquí",
+    "clear": "Borrar",
+    "done": "Listo",
+    "swap": "Invertir",
+    "a11yResult": "Desde {{from}} hasta {{to}}: {{distance}}."
   }
 }

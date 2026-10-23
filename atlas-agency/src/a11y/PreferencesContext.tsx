@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import { getLocales } from 'expo-localization';
 import { useColorScheme } from 'react-native';
 
 import { defaultPreferences, Preferences } from './preferences';
@@ -29,6 +30,12 @@ export interface AppTheme {
   font: { regular: string; bold: string };
   /** Multiply font sizes by this (text-size preference). */
   scale: number;
+}
+
+/** Preferred distance units: the student's choice, else the device's measurement system. */
+export function useUnits(): 'imperial' | 'metric' {
+  const { prefs } = usePreferences();
+  return prefs.units ?? (getLocales()[0]?.measurementSystem === 'us' ? 'imperial' : 'metric');
 }
 
 export function useAppTheme(): AppTheme {

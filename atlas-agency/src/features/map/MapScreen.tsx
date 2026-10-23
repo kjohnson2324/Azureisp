@@ -6,7 +6,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AntarcticaCard } from './ContinentCard';
 import { CountryList } from './CountryList';
+import { greatCircle } from './distance';
 import { prepareGlyphs } from './glyphs';
+import { measureBounds, measureGeoJSON, measurePointFromTap, placePoint, pointLabel, type MeasurePoint } from './measure';
+import { MeasurePanel } from './MeasurePanel';
 import { buildPlaceCard, countryCamera, type Selection, type TapResult } from './model';
 import { PlaceCardSheet } from './PlaceCardSheet';
 import { WorldMap, type WorldMapHandle } from './WorldMap';
@@ -29,12 +32,47 @@ export function MapScreen() {
   const [mode, setMode] = useState<'map' | 'list'>('map');
   const [selection, setSelection] = useState<Selection>();
   const [antarctica, setAntarctica] = useState(false);
+  const [measuring, setMeasuring] = useState(false);
+  const [from, setFrom] = useState<MeasurePoint>();
+  const [to, setTo] = useState<MeasurePoint>();
 
   useEffect(() => {
     void prepareGlyphs().then(setGlyphsBase);
     // Screen-reader users start on the list, which is fully navigable without vision.
     void AccessibilityInfo.isScreenReaderEnabled().then((on) => on && setMode('list'));
   }, []);
+
+  const line = useMemo(() => (from && to ? greatCircle(from.coord, to.coord) : undefined), [from, to]);
+  const measure = useMemo(() => {
+    if (!measuring) return undefined;
+    const name = (p?: MeasurePoint) => (p ? pointLabel(p, locale, repo, t) : '');
+    return measureGeoJSON(from, to, line, [`A · ${name(from)}`, `B · ${name(to)}`]);
+  }, [measuring, from, to, line, locale, repo, t]);
+
+  const setEndpoints = (a?: MeasurePoint, b?: MeasurePoint) => {
+    setFrom(a);
+    setTo(b);
+    if (a && b) {
+      const bounds = measureBounds(greatCircle(a.coord, b.coord));
+      if (bounds) mapRef.current?.fitBounds(bounds);
+      else mapRef.current?.showWorld();
+    }
+  };
+
+  const startMeasuring = (start?: MeasurePoint) => {
+    setSelection(undefined);
+    setAntarctica(false);
+    setMeasuring(true);
+    setFrom(start);
+    setTo(undefined);
+  };
+
+  const onMeasureTap = (features: GeoJSON.Feature[], lngLat: [number, number]) => {
+    const point = measurePointFromTap(features, lngLat);
+    if (!from) setEndpoints(point, to);
+    else if (!to) setEndpoints(from, point);
+    else setEndpoints(point, undefined);
+  };
 
   const card = useMemo(() => (selection ? buildPlaceCard(selection, repo, locale) : undefined), [selection, repo, locale]);
   const selectedIso2 = selection?.kind === 'country' ? selection.iso2 : selection?.place.iso2;
@@ -82,20 +120,45 @@ export function MapScreen() {
                 selectedIso2={selectedIso2}
                 accessibilityLabel={t('map.a11yMap')}
                 onTap={onTap}
+                onMeasureTap={measuring ? onMeasureTap : undefined}
+                measure={measure}
               />
               <View style={styles.floating}>
                 <Button label={t('map.backToWorld')} icon="🌍" onPress={() => { setSelection(undefined); mapRef.current?.showWorld(); }} />
                 <Button label={t('map.downloads')} icon="⬇️" onPress={() => router.push('/downloads')} />
+                {!measuring ? <Button label={t('measure.measure')} icon="📏" onPress={() => startMeasuring()} testID="start-measure" /> : null}
               </View>
             </>
           ) : (
             <AppText style={styles.loading}>{t('map.loading')}</AppText>
           )
         ) : (
-          <CountryList countries={repo.all()} locale={locale} onSelect={selectFromList} />
+          <>
+            <CountryList countries={repo.all()} locale={locale} onSelect={selectFromList} />
+            {!measuring ? (
+              <View style={styles.floating}>
+                <Button label={t('measure.measure')} icon="📏" onPress={() => startMeasuring()} testID="start-measure" />
+              </View>
+            ) : null}
+          </>
         )}
 
-        {card ? <PlaceCardSheet card={card} locale={locale} onClose={() => setSelection(undefined)} /> : null}
+        {card ? (
+          <PlaceCardSheet
+            card={card}
+            locale={locale}
+            onClose={() => setSelection(undefined)}
+            onMeasureFrom={() => {
+              const s = selection;
+              const start = s?.kind === 'place' ? placePoint(s.place.id) : s ? placePoint(`capital:${s.iso2}`) : undefined;
+              startMeasuring(start);
+            }}
+          />
+        ) : null}
+        {measuring ? (
+          <MeasurePanel locale={locale} from={from} to={to} onChange={setEndpoints}
+            onDone={() => { setMeasuring(false); setFrom(undefined); setTo(undefined); }} />
+        ) : null}
         {antarctica && !card ? <AntarcticaCard locale={locale} onClose={() => setAntarctica(false)} /> : null}
       </View>
     </SafeAreaView>

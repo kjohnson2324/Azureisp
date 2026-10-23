@@ -6,12 +6,14 @@ import countriesGeo from '../../../assets/map/countries.geo.json';
 import labelsGeo from '../../../assets/map/labels.geo.json';
 import placesGeo from '../../../assets/map/places.geo.json';
 import { continentById, type ContinentId } from './continents';
+import type { LngLat } from './distance';
 import { layersForTap, resolveTap, type TapResult } from './model';
-import { buildMapStyle, selectionLayer, TIER, WORLD_BOUNDS, WORLD_VIEW } from './style';
+import { buildMapStyle, LAYER, measureLayers, selectionLayer, TIER, WORLD_BOUNDS, WORLD_VIEW } from './style';
 
 export interface WorldMapHandle {
   flyToContinent: (id: ContinentId) => void;
   flyTo: (center: [number, number], zoom: number) => void;
+  fitBounds: (bounds: [number, number, number, number]) => void;
   showWorld: () => void;
 }
 
@@ -25,6 +27,9 @@ interface Props {
   selectedIso2?: string;
   accessibilityLabel: string;
   onTap: (result: TapResult) => void;
+  /** When set, presses go here (measure mode) instead of onTap. */
+  onMeasureTap?: (features: GeoJSON.Feature[], lngLat: LngLat) => void;
+  measure?: { points: GeoJSON.FeatureCollection; line: GeoJSON.FeatureCollection };
 }
 
 export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(props, ref) {
@@ -54,12 +59,15 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(prop
     ),
   }), [props.selectedIso2]);
 
+  const measureLines = useMemo(() => measureLayers(props.dark, props.textScale), [props.dark, props.textScale]);
+
   useImperativeHandle(ref, () => ({
     flyToContinent: (id) => {
       const c = continentById(id);
       if (c) cameraRef.current?.fitBounds(c.bounds, { padding: { top: 40, right: 24, bottom: 40, left: 24 }, duration });
     },
     flyTo: (center, z) => cameraRef.current?.flyTo({ center, zoom: z, duration }),
+    fitBounds: (b) => cameraRef.current?.fitBounds(b, { padding: { top: 80, right: 48, bottom: 360, left: 48 }, duration }),
     showWorld: () => cameraRef.current?.fitBounds(WORLD_VIEW, { duration }),
   }), [duration]);
 
@@ -77,6 +85,12 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(prop
       accessibilityLabel={props.accessibilityLabel}
       onRegionDidChange={(e) => { zoom.current = e.nativeEvent.zoom; }}
       onPress={async (e) => {
+        if (props.onMeasureTap) {
+          const layers = zoom.current >= TIER.cities ? [LAYER.capitals, LAYER.cities, LAYER.fill] : zoom.current >= TIER.capitals ? [LAYER.capitals, LAYER.fill] : [LAYER.fill];
+          const features = await mapRef.current?.queryRenderedFeatures(e.nativeEvent.point, { layers });
+          props.onMeasureTap(features ?? [], e.nativeEvent.lngLat);
+          return;
+        }
         const features = await mapRef.current?.queryRenderedFeatures(e.nativeEvent.point, { layers: layersForTap(zoom.current) });
         props.onTap(resolveTap(features ?? [], zoom.current));
       }}
@@ -91,6 +105,18 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(prop
       <GeoJSONSource id="selection" data={selection}>
         <Layer {...selectionLayer(props.dark)} />
       </GeoJSONSource>
+      {props.measure ? (
+        <>
+          <GeoJSONSource id="measure-line" data={props.measure.line}>
+            <Layer {...measureLines.casing} />
+            <Layer {...measureLines.line} />
+          </GeoJSONSource>
+          <GeoJSONSource id="measure-points" data={props.measure.points}>
+            <Layer {...measureLines.points} />
+            <Layer {...measureLines.labels} />
+          </GeoJSONSource>
+        </>
+      ) : null}
     </Map>
   );
 });

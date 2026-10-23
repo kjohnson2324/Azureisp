@@ -185,6 +185,31 @@ export function buildMapStyle(o: MapStyleOptions): StyleSpecification {
   } as StyleSpecification;
 }
 
+/** Measurement path: dark casing under a bright dashed line, readable on every continent colour. */
+export function measureLayers(dark = false, textScale = 1) {
+  const ink = dark ? '#F4F4F8' : '#1B1F3B';
+  const bright = dark ? palette.yellow : palette.blue;
+  const halo = dark ? '#11132A' : palette.white;
+  return {
+    casing: { id: 'measure-casing', type: 'line' as const, layout: { 'line-cap': 'round' as const, 'line-join': 'round' as const }, paint: { 'line-color': halo, 'line-width': 7 } },
+    line: { id: 'measure-line', type: 'line' as const, layout: { 'line-cap': 'round' as const }, paint: { 'line-color': bright, 'line-width': 4, 'line-dasharray': [1.5, 1] } },
+    points: { id: 'measure-points', type: 'circle' as const, paint: { 'circle-radius': 9, 'circle-color': bright, 'circle-stroke-color': halo, 'circle-stroke-width': 3 } },
+    labels: {
+      id: 'measure-labels',
+      type: 'symbol' as const,
+      layout: {
+        'text-field': ['get', 'label'] as ['get', string],
+        'text-font': ['NotoSans-Medium'],
+        'text-size': 14 * textScale,
+        'text-anchor': 'bottom' as const,
+        'text-offset': [0, -1] as [number, number],
+        'text-allow-overlap': true,
+      },
+      paint: { 'text-color': ink, 'text-halo-color': halo, 'text-halo-width': 2.5 },
+    },
+  };
+}
+
 /** Thick dashed outline for the selected country (rendered as a separate source). */
 export function selectionLayer(dark = false) {
   return {

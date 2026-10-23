@@ -15,10 +15,11 @@ interface Props {
   card: PlaceCard;
   locale: 'en' | 'es';
   onClose: () => void;
+  onMeasureFrom?: () => void;
 }
 
 /** Country / capital / city card: flag, greeting with audio, key facts, photo slot, read-aloud. */
-export function PlaceCardSheet({ card, locale, onClose }: Props) {
+export function PlaceCardSheet({ card, locale, onClose, onMeasureFrom }: Props) {
   const { t } = useTranslation();
   const { prefs } = usePreferences();
   const { colors } = useAppTheme();
@@ -93,6 +94,7 @@ export function PlaceCardSheet({ card, locale, onClose }: Props) {
         <View style={styles.actions}>
           <Button label={t('map.readAloud')} icon="📖" onPress={() => speakAll(cardSpeech(card, locale), locale, prefs)} testID="read-aloud" />
           <Button label={t('map.stop')} icon="⏹" onPress={stopSpeaking} />
+          {onMeasureFrom ? <Button label={t('measure.measureFromHere')} icon="📏" onPress={onMeasureFrom} testID="measure-from-here" /> : null}
         </View>
       </ScrollView>
     </View>

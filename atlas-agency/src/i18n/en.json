@@ -61,5 +61,28 @@
     "failed": "Download failed. Check the connection and try again.",
     "progress": "Downloading {{name}}: {{percent}}%",
     "sharedDevice": "Downloads are saved on this device and contain no student information."
+  },
+  "measure": {
+    "measure": "Measure",
+    "measureHint": "Tap two places on the map, or search for them below.",
+    "from": "From",
+    "to": "To",
+    "pickPlace": "Search a place",
+    "change": "Change",
+    "distance": "Distance as the crow flies",
+    "line": "The shortest path over the globe",
+    "trips_many": "That's like going from school to home and back about {{count}} times!",
+    "trips_once": "That's like going from school to home and back once!",
+    "trips_lessThanOne": "That's shorter than one trip from school to home and back.",
+    "tripAssumption": "(if school is about {{trip}} from home)",
+    "schoolTrip": "How far is school from home?",
+    "schoolTripHint": "Ask a grown-up! This stays on this device.",
+    "spotIn": "A spot in {{country}}",
+    "oceanSpot": "A spot in the ocean",
+    "measureFromHere": "Measure from here",
+    "clear": "Clear",
+    "done": "Done",
+    "swap": "Swap",
+    "a11yResult": "From {{from}} to {{to}}: {{distance}}."
   }
 }
